@@ -1,121 +1,63 @@
 # Propuesta TP DSW
 
 ## Grupo
-
 ### Integrantes
-- 52285 - Gregoret, Agustín
-- 53081 - Huanambal, Ivo
-- 53742 - Bolzico, Nicolás
-- 53952 - Cabrera, Martín Leonel
+* 52285 - Gregoret, Agustín
+* 53081 - Huanambal, Ivo
+* 53742 - Bolzico, Nicolás
+* 53952 - Cabrera, Martín Leonel
 
 ### Repositorios
-- frontend app
-- backend app  
+* [frontend app](http://hyperlinkToGihubOrGitlab)
+* [backend app](http://hyperlinkToGihubOrGitlab)
 
-> Nota: Si se utiliza un monorepo, indicar un solo link con **fullstack app**.
+*Nota*: si utiliza un monorepo indicar un solo link con fullstack app.
 
 ---
 
 ## Tema
 
 ### Descripción
-Aplicación web orientada a la gestión de campañas de juegos de rol de mesa (TTRPG), que permite a usuarios crear campañas, administrar personajes y centralizar la información del juego.  
-
-El sistema facilita la organización de partidas, el seguimiento del progreso de los personajes y la interacción entre jugadores y directores de juego.
-
----
-
-## Modelo
-
-> *(Agregar aquí diagrama: DER, modelo de dominio o clases. Puede ser imagen o Mermaid)*
+Aplicación web para la gestión de campañas de juegos de rol de mesa (TTRPG), permitiendo crear campañas, administrar personajes y organizar eventos.  
+Facilita la interacción entre jugadores y directores de juego, así como el seguimiento del estado y progreso de los personajes.
 
 ---
 
-## Alcance Funcional
+### Modelo
+![imagen del modelo]()
 
-### Regularidad
-
-#### CRUD Simple
-- CRUD Usuario
-- CRUD Campaña
-- CRUD Personaje
-- CRUD Objeto
-- CRUD Dependiente  
-
-**Dependencias:**
-- CRUD Objeto → depende de CRUD CatObjeto  
-- CRUD Evento → depende de CRUD Campaña  
+*Nota*: incluir un link con la imagen de un modelo, puede ser modelo de dominio, diagrama de clases, DER. Si lo prefieren pueden utilizar diagramas con [Mermaid](https://mermaid.js.org) en lugar de imágenes.
 
 ---
 
-#### Listado + Detalle
+## Alcance Funcional 
 
-1. **Listado de campañas**
-   - Filtro: estado  
-   - Muestra: nombre de la campaña + usuario master + imagen  
-   - Detalle: interfaz para unirse y entrar a la sesión  
+### Alcance Mínimo
 
-2. **Listado de personajes no jugables (NPC)**
-   - Condición: pertenecen a al menos un evento de una campaña  
-   - Filtro: estadoAgresión  
-   - Muestra: nombre + descripción  
-   - Detalle: todos los atributos  
+Regularidad:
 
----
-
-#### CUU / Epic
-
-- Unir usuario a campaña  
-- Comenzar campaña y activar un evento  
+|Req|Detalle|
+|:-|:-|
+|CRUD simple|1. CRUD Usuario<br>2. CRUD Campaña<br>3. CRUD Personaje<br>4. CRUD Objeto|
+|CRUD dependiente|1. CRUD Objeto {depende de} CRUD CatObjeto<br>2. CRUD Evento {depende de} CRUD Campaña|
+|Listado<br>+<br>detalle|1. Listado de campañas filtrado por estado, muestra nombre, master e imagen => detalle permite unirse y entrar a la sesión<br>2. Listado de NPC filtrado por estadoAgresión, muestra nombre y descripción => detalle con todos los atributos|
+|CUU/Epic|1. Unir usuario a campaña<br>2. Comenzar campaña y activar un evento|
 
 ---
 
-## Aprobación Directa
+### Adicionales para Aprobación
 
-### CRUD Simple
-- CRUD Usuario  
-- CRUD Campaña  
-- CRUD Participación  
-- CRUD Personaje  
-- CRUD Jugable  
-- CRUD NoJugable  
-- CRUD Objeto  
-- CRUD CatObjeto  
-- CRUD Rasgo  
-- CRUD Acción  
-- CRUD Estadística  
-- CRUD Evento  
-
----
-
-### CUU / Epic
-
-- Crear un personaje con sus atributos, habilidades, estadísticas y objetos  
-- Incorporar un usuario a una campaña (pública o privada)  
-- Activar un evento en una campaña y consultar el estado actual de los personajes participantes  
-- Modificar atributos y agregar/eliminar objetos de un personaje durante una campaña  
+|Req|Detalle|
+|:-|:-|
+|CRUD |1. CRUD Usuario<br>2. CRUD Campaña<br>3. CRUD Participación<br>4. CRUD Personaje<br>5. CRUD Jugable<br>6. CRUD NoJugable<br>7. CRUD Objeto<br>8. CRUD CatObjeto<br>9. CRUD Rasgo<br>10. CRUD Acción<br>11. CRUD Estadística<br>12. CRUD Evento|
+|CUU/Epic|1. Crear un personaje con atributos, habilidades, estadísticas y objetos<br>2. Incorporar usuario a campaña (pública o privada)<br>3. Activar evento y consultar estado de personajes participantes<br>4. Modificar atributos y gestionar objetos durante la campaña|
 
 ---
 
 ## Alcance Adicional Voluntario
 
-### Listados
-
-3. **Listado de objetos de un personaje**
-   - Filtro: categoría  
-   - Muestra: nombre + valor  
-   - Detalle: descripción + imagen (si posee)  
-
----
-
-### CUU / Epic
-
-- Invitar a un usuario a una campaña privada y confirmar su ingreso  
-- Asignar un personaje existente a una campaña  
-- Envío de invitación o notificación de incorporación a campaña por email  
-
----
-
-## Correcciones
-
-> *(Completar con observaciones del docente si las hay)*
+|Req|Detalle|
+|:-|:-|
+|Listados |1. Listado de objetos de un personaje filtrado por categoría, muestra nombre y valor => detalle con descripción e imagen|
+|CUU/Epic|1. Invitar usuario a campaña privada y confirmar ingreso<br>2. Asignar personaje a campaña|
+|Otros|1. Envío de invitación o notificación por email|
