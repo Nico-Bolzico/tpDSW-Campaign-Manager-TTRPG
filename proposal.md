@@ -24,7 +24,7 @@ Facilita la interacción entre jugadores y directores de juego, así como el seg
 ---
 
 ### Modelo
-![imagen del modelo]()
+![Modelo](modelo.jfif)
 
 *Nota*: incluir un link con la imagen de un modelo, puede ser modelo de dominio, diagrama de clases, DER. Si lo prefieren pueden utilizar diagramas con [Mermaid](https://mermaid.js.org) en lugar de imágenes.
 
