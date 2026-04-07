@@ -1,52 +1,121 @@
 # Propuesta TP DSW
 
 ## Grupo
+
 ### Integrantes
-* legajo - Apellido(s), Nombre(s)
+- 52285 - Gregoret, Agustín
+- 53081 - Huanambal, Ivo
+- 53742 - Bolzico, Nicolás
+- 53952 - Cabrera, Martín Leonel
 
 ### Repositorios
-* [frontend app](http://hyperlinkToGihubOrGitlab)
-* [backend app](http://hyperlinkToGihubOrGitlab)
-*Nota*: si utiliza un monorepo indicar un solo link con fullstack app.
+- frontend app
+- backend app  
+
+> Nota: Si se utiliza un monorepo, indicar un solo link con **fullstack app**.
+
+---
 
 ## Tema
+
 ### Descripción
-*2 a 6 líneas describiendo el negocio (menos es más)*
+Aplicación web orientada a la gestión de campañas de juegos de rol de mesa (TTRPG), que permite a usuarios crear campañas, administrar personajes y centralizar la información del juego.  
 
-### Modelo
-![imagen del modelo]()
+El sistema facilita la organización de partidas, el seguimiento del progreso de los personajes y la interacción entre jugadores y directores de juego.
 
-*Nota*: incluir un link con la imagen de un modelo, puede ser modelo de dominio, diagrama de clases, DER. Si lo prefieren pueden utilizar diagramas con [Mermaid](https://mermaid.js.org) en lugar de imágenes.
+---
 
-## Alcance Funcional 
+## Modelo
 
-### Alcance Mínimo
+> *(Agregar aquí diagrama: DER, modelo de dominio o clases. Puede ser imagen o Mermaid)*
 
-*Nota*: el siguiente es un ejemplo para un grupo de 3 integrantes para un sistema de hotel. El 
+---
 
-Regularidad:
-|Req|Detalle|
-|:-|:-|
-|CRUD simple|1. CRUD Tipo Habitacion<br>2. CRUD Servicio<br>3. CRUD Localidad|
-|CRUD dependiente|1. CRUD Habitación {depende de} CRUD Tipo Habitacion<br>2. CRUD Cliente {depende de} CRUD Localidad|
-|Listado<br>+<br>detalle| 1. Listado de habitaciones filtrado por tipo de habitación, muestra nro y tipo de habitación => detalle CRUD Habitacion<br> 2. Listado de reservas filtrado por rango de fecha, muestra nro de habitación, fecha inicio y fin estadía, estado y nombre del cliente => detalle muestra datos completos de la reserva y del cliente|
-|CUU/Epic|1. Reservar una habitación para la estadía<br>2. Realizar el check-in de una reserva|
+## Alcance Funcional
 
+### Regularidad
 
-Adicionales para Aprobación
-|Req|Detalle|
-|:-|:-|
-|CRUD |1. CRUD Tipo Habitacion<br>2. CRUD Servicio<br>3. CRUD Localidad<br>4. CRUD Provincia<br>5. CRUD Habitación<br>6. CRUD Empleado<br>7. CRUD Cliente|
-|CUU/Epic|1. Reservar una habitación para la estadía<br>2. Realizar el check-in de una reserva<br>3. Realizar el check-out y facturación de estadía y servicios|
+#### CRUD Simple
+- CRUD Usuario
+- CRUD Campaña
+- CRUD Personaje
+- CRUD Objeto
+- CRUD Dependiente  
 
+**Dependencias:**
+- CRUD Objeto → depende de CRUD CatObjeto  
+- CRUD Evento → depende de CRUD Campaña  
 
-### Alcance Adicional Voluntario
+---
 
-*Nota*: El Alcance Adicional Voluntario es opcional, pero ayuda a que la funcionalidad del sistema esté completa y será considerado en la nota en función de su complejidad y esfuerzo.
+#### Listado + Detalle
 
-|Req|Detalle|
-|:-|:-|
-|Listados |1. Estadía del día filtrado por fecha muestra, cliente, habitaciones y estado <br>2. Reservas filtradas por cliente muestra datos del cliente y de cada reserve fechas, estado cantidad de habitaciones y huespedes|
-|CUU/Epic|1. Consumir servicios<br>2. Cancelación de reserva|
-|Otros|1. Envío de recordatorio de reserva por email|
+1. **Listado de campañas**
+   - Filtro: estado  
+   - Muestra: nombre de la campaña + usuario master + imagen  
+   - Detalle: interfaz para unirse y entrar a la sesión  
 
+2. **Listado de personajes no jugables (NPC)**
+   - Condición: pertenecen a al menos un evento de una campaña  
+   - Filtro: estadoAgresión  
+   - Muestra: nombre + descripción  
+   - Detalle: todos los atributos  
+
+---
+
+#### CUU / Epic
+
+- Unir usuario a campaña  
+- Comenzar campaña y activar un evento  
+
+---
+
+## Aprobación Directa
+
+### CRUD Simple
+- CRUD Usuario  
+- CRUD Campaña  
+- CRUD Participación  
+- CRUD Personaje  
+- CRUD Jugable  
+- CRUD NoJugable  
+- CRUD Objeto  
+- CRUD CatObjeto  
+- CRUD Rasgo  
+- CRUD Acción  
+- CRUD Estadística  
+- CRUD Evento  
+
+---
+
+### CUU / Epic
+
+- Crear un personaje con sus atributos, habilidades, estadísticas y objetos  
+- Incorporar un usuario a una campaña (pública o privada)  
+- Activar un evento en una campaña y consultar el estado actual de los personajes participantes  
+- Modificar atributos y agregar/eliminar objetos de un personaje durante una campaña  
+
+---
+
+## Alcance Adicional Voluntario
+
+### Listados
+
+3. **Listado de objetos de un personaje**
+   - Filtro: categoría  
+   - Muestra: nombre + valor  
+   - Detalle: descripción + imagen (si posee)  
+
+---
+
+### CUU / Epic
+
+- Invitar a un usuario a una campaña privada y confirmar su ingreso  
+- Asignar un personaje existente a una campaña  
+- Envío de invitación o notificación de incorporación a campaña por email  
+
+---
+
+## Correcciones
+
+> *(Completar con observaciones del docente si las hay)*
