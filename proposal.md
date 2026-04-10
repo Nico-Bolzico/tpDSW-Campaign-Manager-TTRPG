@@ -38,7 +38,7 @@ Regularidad:
 
 |Req|Detalle|
 |:-|:-|
-|CRUD simple|1. CRUD Usuario<br>2. CRUD Campaña<br>3. CRUD Personaje<br>4. CRUD Objeto|
+|CRUD simple|1. CRUD Usuario<br>2. CRUD Campaña<br>3. CRUD Rasgo<br>4. CRUD CatObjeto|
 |CRUD dependiente|1. CRUD Objeto {depende de} CRUD CatObjeto<br>2. CRUD Evento {depende de} CRUD Campaña|
 |Listado<br>+<br>detalle|1. Listado de campañas filtrado por estado, muestra nombre, master e imagen => detalle permite unirse y entrar a la sesión<br>2. Listado de NPC filtrado por estadoAgresión, muestra nombre y descripción => detalle con todos los atributos|
 |CUU/Epic|1. Unir usuario a campaña<br>2. Comenzar campaña y activar un evento|
@@ -50,7 +50,7 @@ Regularidad:
 |Req|Detalle|
 |:-|:-|
 |CRUD |1. CRUD Usuario<br>2. CRUD Campaña<br>3. CRUD Participación<br>4. CRUD Personaje<br>5. CRUD Jugable<br>6. CRUD NoJugable<br>7. CRUD Objeto<br>8. CRUD CatObjeto<br>9. CRUD Rasgo<br>10. CRUD Acción<br>11. CRUD Estadística<br>12. CRUD Evento|
-|CUU/Epic|1. Crear un personaje con atributos, habilidades, estadísticas y objetos<br>2. Incorporar usuario a campaña (pública o privada)<br>3. Activar evento y consultar estado de personajes participantes<br>4. Modificar atributos y gestionar objetos durante la campaña|
+|CUU/Epic|1. Crear un personaje con atributos, habilidades, estadísticas y objetos<br>2. Sistema de chat entre jugadores en partida. <br>3. Activar evento y consultar estado de personajes participantes<br>4. Modificar atributos y gestionar objetos durante la campaña|
 
 ---
 
