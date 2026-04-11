@@ -39,9 +39,9 @@ Regularidad:
 |Req|Detalle|
 |:-|:-|
 |CRUD simple|1. CRUD Usuario<br>2. CRUD Campaña<br>3. CRUD Rasgo<br>4. CRUD CatObjeto|
-|CRUD dependiente|1. CRUD Objeto {depende de} CRUD CatObjeto<br>2. CRUD Evento {depende de} CRUD Campaña|
+|CRUD dependiente|1. CRUD Personaje {depende de} CRUD Usuario<br>2. CRUD Personaje {depende de} CRUD Usuario|
 |Listado<br>+<br>detalle|1. Listado de campañas filtrado por estado, muestra nombre, master e imagen => detalle permite unirse y entrar a la sesión<br>2. Listado de NPC filtrado por estadoAgresión, muestra nombre y descripción => detalle con todos los atributos|
-|CUU/Epic|1. Unir usuario a campaña<br>2. Comenzar campaña y activar un evento|
+|CUU/Epic|1. CUU crear un evento con su descripción e imagenes y asignarle personajes<br>2. Comenzar campaña y activar un evento|
 
 ---
 
@@ -49,8 +49,8 @@ Regularidad:
 
 |Req|Detalle|
 |:-|:-|
-|CRUD |1. CRUD Usuario<br>2. CRUD Campaña<br>3. CRUD Participación<br>4. CRUD Personaje<br>5. CRUD Jugable<br>6. CRUD NoJugable<br>7. CRUD Objeto<br>8. CRUD CatObjeto<br>9. CRUD Rasgo<br>10. CRUD Acción<br>11. CRUD Estadística<br>12. CRUD Evento|
-|CUU/Epic|1. Crear un personaje con atributos, habilidades, estadísticas y objetos<br>2. Sistema de chat entre jugadores en partida. <br>3. Activar evento y consultar estado de personajes participantes<br>4. Modificar atributos y gestionar objetos durante la campaña|
+|CRUD |1. CRUD Usuario<br>2. CRUD Campaña<br>3. CRUD Participación<br>4. CRUD Personaje<br>5. CRUD Jugable<br>6. CRUD NoJugable<br>7. CRUD Objeto<br>8. CRUD CatObjeto<br>9. CRUD Rasgo<br>10. CRUD Acción<br>11. CRUD Estadística<br>12. CRUD Imagen|
+|CUU/Epic|1. Crear un personaje con atributos, habilidades, estadísticas y objetos<br>2. Sistema de chat entre jugadores en partida.<br>3. Activar evento y consultar estado de personajes participantes<br>4. Modificar atributos y gestionar objetos durante la campaña|
 
 ---
 
@@ -60,4 +60,4 @@ Regularidad:
 |:-|:-|
 |Listados |1. Listado de objetos de un personaje filtrado por categoría, muestra nombre y valor => detalle con descripción e imagen|
 |CUU/Epic|1. Invitar usuario a campaña privada y confirmar ingreso<br>2. Asignar personaje a campaña|
-|Otros|1. Envío de invitación o notificación por email|
+|Otros|1. Envío de invitación o notificación por email<br>2. Sistema de dados que puede utilizarse en campaña y escribe resultado por el chat|
