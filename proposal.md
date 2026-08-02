@@ -3,7 +3,6 @@
 ## Grupo
 ### Integrantes
 * 52285 - Gregoret, Agustín
-* 53081 - Huanambal, Ivo
 * 53742 - Bolzico, Nicolás
 * 53952 - Cabrera, Martín Leonel
 
@@ -35,8 +34,8 @@ Regularidad:
 
 |Req|Detalle|
 |:-|:-|
-|CRUD simple|1. CRUD Usuario<br>2. CRUD Campaña<br>3. CRUD Rasgo<br>4. CRUD CatObjeto|
-|CRUD dependiente|1. CRUD Personaje {depende de} CRUD Usuario<br>2. CRUD Personaje {depende de} CRUD Usuario|
+|CRUD simple|1. CRUD Usuario<br>2. CRUD Campaña<br>3. CRUD Rasgo|
+|CRUD dependiente|1. CRUD Personaje {depende de} CRUD Usuario<br>2. CRUD Participación {depende de} CRUD Usuario CRUD Jugable y CRUD Campaña|
 |Listado<br>+<br>detalle|1. Listado de campañas filtrado por estado, muestra nombre, master e imagen => detalle permite unirse y entrar a la sesión<br>2. Listado de NPC filtrado por estadoAgresión, muestra nombre y descripción => detalle con todos los atributos|
 |CUU/Epic|1. CUU crear un evento con su descripción e imagenes y asignarle personajes<br>2. Comenzar campaña y activar un evento|
 
