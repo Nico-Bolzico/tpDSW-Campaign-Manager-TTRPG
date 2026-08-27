@@ -1,0 +1,160 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id                  Int         @id @default(autoincrement())
+  nombre              String
+  contrasena          String
+  personajes          Personaje[] // (jugables)
+  campanasComoDM      Campana[]   @relation("CampanaDM")
+  campanasComoJugador Campana[]   @relation("CampanaJugadores")
+}
+
+model Campana {
+  id                Int                @id @default(autoincrement())
+  nombre            String
+  descripcion       String?
+  estado            String
+  dm                Usuario            @relation("CampanaDM", fields: [dmId], references: [id])
+  dmId              Int
+  jugadores         Usuario[]          @relation("CampanaJugadores")
+  eventos           Evento[]
+  imagen            Imagen?            @relation(fields: [imagenId], references: [id])
+  imagenId          Int?
+  personajeCampanas PersonajeCampana[]
+}
+
+model Evento {
+  id                 Int               @id @default(autoincrement())
+  nombre             String
+  descripcion        String?
+  campana            Campana           @relation(fields: [campanaId], references: [id])
+  campanaId          Int
+  imagen             Imagen?           @relation(fields: [imagenId], references: [id])
+  imagenId           Int?
+  personajes         Personaje[] // "participan" — many-to-many
+  personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
+  personajeCampanaId Int?
+}
+
+model Imagen {
+  id          Int         @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  archivo     String
+  campanas    Campana[]
+  eventos     Evento[]
+  personajes  Personaje[]
+}
+
+enum TipoPersonaje {
+  JUGABLE
+  NO_JUGABLE
+}
+
+model Personaje {
+  id          Int           @id @default(autoincrement())
+  tipo        TipoPersonaje
+  nombre      String
+  descripcion String?
+  especie     String?
+  clase       String?
+  imagen      Imagen?       @relation(fields: [imagenId], references: [id])
+  imagenId    Int?
+
+  usuario   Usuario? @relation(fields: [usuarioId], references: [id])
+  usuarioId Int?
+
+  estadoAgresion String?
+
+  // starting/inherent kit — part of the character's identity, carries into every campaign
+  objetos      Objeto[]
+  acciones     Accion[]
+  rasgos       Rasgo[]
+  estadisticas Estadistica[]
+
+  instancias PersonajeCampana[]
+  evento     Evento?            @relation(fields: [eventoId], references: [id])
+  eventoId   Int?
+}
+
+model PersonajeCampana {
+  id          Int       @id @default(autoincrement())
+  personaje   Personaje @relation(fields: [personajeId], references: [id])
+  personajeId Int
+  campana     Campana   @relation(fields: [campanaId], references: [id])
+  campanaId   Int
+
+  nivel       Int     @default(1)
+  armadura    String?
+  iniciativa  Int?
+  velocidad   Int?
+  vidaMax     Int?
+  vidaActual  Int?
+  manaMax     Int?
+  manaActual  Int?
+  experiencia Int     @default(0)
+  oro         Int     @default(0)
+
+  // acquired during this specific campaign — additive on top of the template's set
+  objetos      Objeto[]
+  acciones     Accion[]
+  rasgos       Rasgo[]
+  estadisticas Estadistica[]
+  eventos      Evento[]
+
+  @@unique([personajeId, campanaId])
+}
+
+model Objeto {
+  id                 Int               @id @default(autoincrement())
+  nombre             String
+  descripcion        String?
+  valor              Int?
+  categoria          CatObjeto         @relation(fields: [catObjetoId], references: [id])
+  catObjetoId        Int
+  personajes         Personaje[]
+  personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
+  personajeCampanaId Int?
+}
+
+model CatObjeto {
+  id      Int      @id @default(autoincrement())
+  nombre  String
+  objetos Objeto[]
+}
+
+model Rasgo {
+  id                 Int               @id @default(autoincrement())
+  nombre             String
+  descripcion        String?
+  personajes         Personaje[]
+  personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
+  personajeCampanaId Int?
+}
+
+model Accion {
+  id                 Int               @id @default(autoincrement())
+  nombre             String
+  descripcion        String?
+  personajes         Personaje[]
+  personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
+  personajeCampanaId Int?
+}
+
+model Estadistica {
+  id                 Int               @id @default(autoincrement())
+  nombre             String
+  valor              Int
+  modificador        String?
+  personajes         Personaje[]
+  personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
+  personajeCampanaId Int?
+}
