@@ -68,6 +68,12 @@ model Personaje {
   clase       String?
   imagen      Imagen?       @relation(fields: [imagenId], references: [id])
   imagenId    Int?
+  nivel       Int           @default(1)
+  armadura    String?
+  iniciativa  Int?
+  velocidad   Int?
+  vidaMax     Int?
+  manaMax     Int?
 
   usuario   Usuario? @relation(fields: [usuarioId], references: [id])
   usuarioId Int?
