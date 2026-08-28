@@ -10,7 +10,7 @@ datasource db {
 
 model Usuario {
   id                  Int         @id @default(autoincrement())
-  nombre              String
+  nombre              String      @unique
   contrasena          String
   personajes          Personaje[] // (jugables)
   campanasComoDM      Campana[]   @relation("CampanaDM")
@@ -39,7 +39,7 @@ model Evento {
   campanaId          Int
   imagen             Imagen?           @relation(fields: [imagenId], references: [id])
   imagenId           Int?
-  personajes         Personaje[] // "participan" — many-to-many
+  personajes         Personaje[] // # (personajes que participan en el evento) 
   personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
   personajeCampanaId Int?
 }

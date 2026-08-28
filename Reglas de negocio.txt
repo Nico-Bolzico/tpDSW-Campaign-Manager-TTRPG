@@ -1,0 +1,78 @@
+1#USUARIO
+    .)Nombre unico y no repetible entre usuarios
+    .) -POR AHORA- no se puede eliminar un Usuario que sea MASTER de alguna Campana existente
+    .)Cuando se borra un Usuario se lo quita de todas las Campañas donde es jugador
+    .) se borra el usuario --> entonces se borran todos los personajes que haya creado el usuario
+    .) al sumarse a una campaña no puede ingresar un personaje -->que ya haya sido creado por otro usuario
+                                                 |-->con mas de un personaje 
+2#CAMPAÑA
+    .)Creada por un solo Usuario
+    .)Estado = ["planificada" / "activa" / "pausada" / "finalizada"]
+    .)Transiciones de estado válidas : planificada → activa → pausada ⇄ activa → finalizada
+    .) -¿Que pasa si se borra una campaña qeu tenga eventos-personajes asociados?-
+    .) - Como vamos a hacer para borrar una campaña y que siga existiendo un PersonajeCampana?-
+            OPC1) Para "borrar" una campaña con historial, ofrecer en cambio un cambio de estado a finalizada/archivada en vez de DELETE físico
+    .) MASTER --> El master no debería poder agregarse a sí mismo como jugador de su propia campaña
+    .) si el estado de la campaña es "finalizada" no se pueden agregar jugadores ni eventos ni modificar a "PersonajeCampana"
+
+3#Evento
+  .)Un evento no puede reciclarse para otra campaña
+  .) "Comenzar campaña y activar evento" --> solo el MASTER puede hacerlo
+  .) Un evento puede tener un estado (pendiente, en curso, finalizado)
+
+4#Imagen
+  .) un evento  puede tener una imagen asociada
+  .) un personaje  puede tener una imagen asociada
+  .) un usuario  puede tener una imagen asociada
+  .) un objeto puede tener una imagen asociada
+
+5#Personaje
+  .)Un personaje puede tener un tipo (jugable, no jugable)
+  .) tipo = jugable -->
+        .) un personaje jugable es creado por un usuario
+        .) un personaje jugable puede ser agregado a una campaña por su creador 
+        .) un personaje jugable puede ser eliminado por su creador  --- o por el MASTER de la campaña---
+  .) tipo = no jugable -->
+        .) "estadoAgresion" = ["hostil" | "neutral" | "amistoso"]  (es un ejemplo)
+  .)Un personaje puede estar en varias campañas
+  .)Un personaje solo puede ser modificado o creado por el Usuario que lo creó 
+  .)No se pude eliminar un personaje que esté asociado a una campaña activa (es decir, que tenga una instancia de PersonajeCampana asociado a una Campaña)
+  .)No se puede cambiar el tipo de personaje de jugable a no jugable
+
+6#PersonajeCampana (instancia dentro de una campaña — el "estado en vivo")
+  .) Es de tipo @unique --> esta instanicia de personaje solo puede estar en una campaña 
+  .)vidaActual no debe ser mayor a vidaMaxima
+      .) si vidaActual = 0 --> el personaje está "muerto" y no puede participar en eventos ---Ver dee crear un estado "muerto" para PersonajeCampana---
+  .) manaActual no debe ser mayor a manaMax, ni negativo
+  .) ---experiencia y oro--- no se que hacen
+  .)Solo el MASTER de la campaña puede modificar los atributos de PersonajeCampana
+      .) El usuario solo puede modificar atributos no criticos de PersonajeCampana (ej: nombre, descripcion, imagen, etc)
+  .)No se puede elimiar un PersonajeCampana sin antes saber que pasa con los objetos que tenga asociados (ej: si el personaje tiene un objeto "espada" y se elimina el PersonajeCampana, que pasa con la espada? se borra? se queda en la campaña? se le asigna a otro personaje? etc) Lo mismo para rasgo, accion, estadistica, eventos asociados al mismo (la BD los deja NULL pero noostros tenemos que definir que hacer con ellos)
+
+7#Objetos
+  .)valor --> solo puede ser positivo
+  .)Un objeto puede estar en el kit inheritado de un Personaje y/o en el inventario de un PersonajeCampana
+      .)--- Definir si un mismo objeto puede estar en el kit de un personaje y en el inventario de un PersonajeCampana al mismo tiempo ---
+
+8#CatObjeto
+  .)no se puede eliminar una CatObjeto si hay objetos asociados a la misma
+  .)antes de borrar, ofrecer reasignar los objetos a otra CatObjeto o bloquear con un mensaje
+
+9#Rasgo
+  .) igual que en objeto: definir si el kit inherente (desde personaje) y adquirido en campaña (desde PersonajeCampana) pueden coexistir al mismo tiempo
+
+10#Accion
+  .)igual que en objeto: definir si el kit inherente (desde personaje) y adquirido en campaña (desde PersonajeCampana) pueden coexistir al mismo tiempo
+
+11#Estadistica
+  .)valor --> solo puede ser positivo
+  .)modificador podemos definirlo como un valor calculado a partir de "valor" o como un valor independiente que puede ser modificado por el MASTER de la campaña
+
+----# Reglas Impostantes de integridad de la BD propuesta por Claude #---
+1)Consistencia campaña-personaje: en cualquier endpoint donde se reciban juntos campanaId y personajeId/personajeCampanaId/eventoId, validar que todos pertenezcan al mismo árbol de datos (evitar mezclar entidades de campañas distintas).
+2)Transacciones: operaciones que tocan más de una tabla a la vez (ej: crear PersonajeCampana + sus Estadisticas iniciales, o borrar una Campana  deben hacerse dentro de una transacción de Prisma (prisma.$transaction) para evitar estados intermedios inconsistentes.
+3)Autorización por fila, no solo por endpoint: no alcanza con "está logueado", hay que verificar en cada operación que el usuario autenticado tiene el rol correcto sobre ESE recurso puntual (dueño del personaje, DM de ESA campaña, etc.), no de cualquier campaña.
+4)Validación de existencia antes de vincular: toda FK opcional que el usuario mande (imagenId, eventoId, usuarioId, etc.) debe validarse contra la tabla real antes del create/update, para devolver un 404/400 claro en vez de un error de FK crudo de MySQL.
+5)Errores de FK → mensajes de negocio: envolver los try/catch en el service layer para traducir códigos de error de Prisma (P2003 FK violation, P2002 unique violation, P2025 registro no encontrado) a respuestas HTTP con mensajes entendibles para el frontend, en vez de exponer el error crudo de MySQL/Prisma.
+6)Borrado lógico vs físico: para Campana, PersonajeCampana y Usuario (entidades con historial importante), evaluá si conviene un borrado lógico (campo activo/estado) en vez de DELETE físico, ya que hoy varias de estas eliminaciones están bloqueadas por RESTRICT precisamente porque tienen historial asociado.
+7) "CUU crear un evento con su descripción e imágenes y asignarle personajes": al asignar personajes, validar que pertenezcan a la campaña del evento — y que el usuario que crea el evento sea el DM de esa campaña.
