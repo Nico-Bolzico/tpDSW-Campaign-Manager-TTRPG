@@ -14,11 +14,14 @@
     "@prisma/client": "^6.19.3",
     "dotenv": "^17.4.2",
     "express": "5.2.1",
+    "jsonwebtoken": "^9.0.3",
     "mysql2": "^3.24.2",
-    "prompt-sync": "^4.2.0"
+    "prompt-sync": "^4.2.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@types/express": "5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "26.3.0",
     "prisma": "^6.19.3",
     "tsc-watch": "7.2.1",
