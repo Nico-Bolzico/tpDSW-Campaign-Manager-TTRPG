@@ -1,6 +1,6 @@
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -8,56 +8,95 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Usuario {
-  id                  Int         @id @default(autoincrement())
-  nombre              String      @unique
-  contrasena          String
-  personajes          Personaje[] // (jugables)
-  campanasComoDM      Campana[]   @relation("CampanaDM")
-  campanasComoJugador Campana[]   @relation("CampanaJugadores")
-}
-
-model Campana {
-  id                Int                @id @default(autoincrement())
-  nombre            String
-  descripcion       String?
-  estado            String
-  dm                Usuario            @relation("CampanaDM", fields: [dmId], references: [id])
-  dmId              Int
-  jugadores         Usuario[]          @relation("CampanaJugadores")
-  eventos           Evento[]
-  imagen            Imagen?            @relation(fields: [imagenId], references: [id])
-  imagenId          Int?
-  personajeCampanas PersonajeCampana[]
-}
-
-model Evento {
-  id                 Int               @id @default(autoincrement())
-  nombre             String
-  descripcion        String?
-  campana            Campana           @relation(fields: [campanaId], references: [id])
-  campanaId          Int
-  imagen             Imagen?           @relation(fields: [imagenId], references: [id])
-  imagenId           Int?
-  personajes         Personaje[] // # (personajes que participan en el evento) 
-  personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
-  personajeCampanaId Int?
-}
-
-model Imagen {
-  id          Int         @id @default(autoincrement())
-  nombre      String
-  descripcion String?
-  archivo     String
-  campanas    Campana[]
-  eventos     Evento[]
-  personajes  Personaje[]
-}
+// ===================== ENUMS =====================
 
 enum TipoPersonaje {
-  JUGABLE
-  NO_JUGABLE
+  jugable
+  no_jugable
 }
+
+enum EstadoCampana {
+  planificada
+  activa
+  pausada
+  finalizada
+}
+
+// ===================== USUARIO =====================
+
+model Usuario {
+  id         Int     @id @default(autoincrement())
+  nombre     String  @unique
+  contrasena String
+  tipo       String? // ASUNCIÓN: rol a nivel sistema, ver nota al final
+  activo     Boolean @default(true) // baja lógica
+
+  imagen   Imagen? @relation(fields: [imagenId], references: [id])
+  imagenId Int?
+
+  personajes        Personaje[] // plantillas de PJ y NPCs que creó
+  campanasCreadas   Campana[]          @relation("CampanasCreadas")
+  personajesCampana PersonajeCampana[] // instancias que posee (jugador)
+}
+
+// ===================== CAMPAÑA =====================
+
+model Campana {
+  id          Int           @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  estado      EstadoCampana @default(planificada)
+  activo      Boolean       @default(true) // baja lógica
+
+  master    Usuario @relation("CampanasCreadas", fields: [usuarioId], references: [id])
+  usuarioId Int
+
+  npcs      Personaje[] // NPCs pertenecientes a esta campaña (tipo=no_jugable)
+  jugadores PersonajeCampana[] // instancias de PJs participantes
+  mapas     Mapa[]
+  objetos   Objeto[] // objetos específicos de esta campaña
+  rasgos    Rasgo[]
+  acciones  Accion[]
+}
+
+// ===================== MAPA =====================
+
+model Mapa {
+  id          Int     @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  estado      String? // ASUNCIÓN: ver nota al final
+
+  campana   Campana @relation(fields: [campanaId], references: [id])
+  campanaId Int
+
+  imagen   Imagen? @relation(fields: [imagenId], references: [id])
+  imagenId Int?
+
+  fichas FichaMapa[]
+}
+
+// FichaMapa: posición de un personaje (PJ o NPC) dentro de un mapa concreto
+model FichaMapa {
+  id        Int     @id @default(autoincrement())
+  posicionX Int
+  posicionY Int
+  estado    String?
+
+  mapa   Mapa @relation(fields: [mapaId], references: [id])
+  mapaId Int
+
+  // Exactamente uno de los dos debe estar seteado (se valida en el service, no en la DB)
+  personaje          Personaje?        @relation(fields: [personajeId], references: [id])
+  personajeId        Int?
+  personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
+  personajeCampanaId Int?
+
+  imagen   Imagen? @relation(fields: [imagenId], references: [id])
+  imagenId Int?
+}
+
+// ===================== PERSONAJE (tabla única con discriminador) =====================
 
 model Personaje {
   id          Int           @id @default(autoincrement())
@@ -65,71 +104,95 @@ model Personaje {
   nombre      String
   descripcion String?
   especie     String?
-  clase       String?
-  imagen      Imagen?       @relation(fields: [imagenId], references: [id])
-  imagenId    Int?
-  nivel       Int           @default(1)
   armadura    String?
   iniciativa  Int?
   velocidad   Int?
   vidaMax     Int?
+  activo      Boolean       @default(true) // baja lógica
+
+  imagen   Imagen? @relation(fields: [imagenId], references: [id])
+  imagenId Int?
+
+  fuerza       Int?
+  destreza     Int?
+  constitucion Int?
+  inteligencia Int?
+  carisma      Int?
+  sabiduria    Int?
+
+  // --- Solo aplica si tipo = jugable (validado en el service) ---
+  clase       String?
+  nivel       Int?    @default(1)
   manaMax     Int?
+  experiencia Int?
+  oro         Int?
 
-  usuario   Usuario? @relation(fields: [usuarioId], references: [id])
-  usuarioId Int?
-
+  // --- Solo aplica si tipo = no_jugable ---
   estadoAgresion String?
+  campana        Campana? @relation(fields: [campanaId], references: [id])
+  campanaId      Int? // obligatorio a nivel de negocio cuando tipo=no_jugable
 
-  // starting/inherent kit — part of the character's identity, carries into every campaign
-  objetos      Objeto[]
-  acciones     Accion[]
-  rasgos       Rasgo[]
-  estadisticas Estadistica[]
+  usuario   Usuario @relation(fields: [usuarioId], references: [id])
+  usuarioId Int
 
-  instancias PersonajeCampana[]
-  evento     Evento?            @relation(fields: [eventoId], references: [id])
-  eventoId   Int?
+  objetos  PersonajeObjeto[]
+  acciones Accion[]
+  rasgos   Rasgo[]
+
+  instancias PersonajeCampana[] // solo se crean si tipo = jugable
+  fichasMapa FichaMapa[] // posición directa en mapa
+}
+
+// ===================== PERSONAJE_CAMPANA =====================
+
+enum EstadoPersonajeCampana {
+  vivo
+  muerto
+  inconsciente
 }
 
 model PersonajeCampana {
-  id          Int       @id @default(autoincrement())
+  id           Int                    @id @default(autoincrement())
+  nombre       String
+  armadura     String?
+  iniciativa   Int?
+  velocidad    Int?
+  vidaMax      Int
+  vidaActual   Int
+  nivel        Int                    @default(1)
+  oro          Int?
+  experiencia  Int?
+  clase        String?
+  manaMax      Int?
+  manaActual   Int?
+  fuerza       Int?
+  destreza     Int?
+  constitucion Int?
+  sabiduria    Int?
+  carisma      Int?
+  inteligencia Int?
+  activo       Boolean                @default(true) // baja lógica
+  estado       EstadoPersonajeCampana @default(vivo)
+
   personaje   Personaje @relation(fields: [personajeId], references: [id])
   personajeId Int
-  campana     Campana   @relation(fields: [campanaId], references: [id])
-  campanaId   Int
 
-  nivel       Int     @default(1)
-  armadura    String?
-  iniciativa  Int?
-  velocidad   Int?
-  vidaMax     Int?
-  vidaActual  Int?
-  manaMax     Int?
-  manaActual  Int?
-  experiencia Int     @default(0)
-  oro         Int     @default(0)
+  campana   Campana @relation(fields: [campanaId], references: [id])
+  campanaId Int
 
-  // acquired during this specific campaign — additive on top of the template's set
-  objetos      Objeto[]
-  acciones     Accion[]
-  rasgos       Rasgo[]
-  estadisticas Estadistica[]
-  eventos      Evento[]
+  objetos    PersonajeCampanaObjeto[]
+  acciones   Accion[]
+  rasgos     Rasgo[]
+  fichasMapa FichaMapa[]
+  usuario    Usuario?                 @relation(fields: [usuarioId], references: [id])
+  usuarioId  Int?
 
+  // Un mismo Personaje no puede tener dos instancias en la MISMA campaña
+  // (pero sí una instancia por cada campaña distinta en la que participe)
   @@unique([personajeId, campanaId])
 }
 
-model Objeto {
-  id                 Int               @id @default(autoincrement())
-  nombre             String
-  descripcion        String?
-  valor              Int?
-  categoria          CatObjeto         @relation(fields: [catObjetoId], references: [id])
-  catObjetoId        Int
-  personajes         Personaje[]
-  personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
-  personajeCampanaId Int?
-}
+// ===================== OBJETOS =====================
 
 model CatObjeto {
   id      Int      @id @default(autoincrement())
@@ -137,30 +200,92 @@ model CatObjeto {
   objetos Objeto[]
 }
 
+model Objeto {
+  id              Int     @id @default(autoincrement())
+  nombre          String
+  descripcion     String?
+  visibleAJugador Boolean @default(true)
+  valor           Int // solo positivo, se valida en el DTO
+  activo          Boolean @default(true)
+
+  imagen   Imagen? @relation(fields: [imagenId], references: [id])
+  imagenId Int?
+
+  categoria   CatObjeto? @relation(fields: [catObjetoId], references: [id])
+  catObjetoId Int?
+
+  // scope: null = general, seteado = específico de esa campaña
+  campana   Campana? @relation(fields: [campanaId], references: [id])
+  campanaId Int?
+
+  personajes        PersonajeObjeto[]
+  personajesCampana PersonajeCampanaObjeto[]
+}
+
+// Clases asociativas (Personaje/PersonajeCampana <-> Objeto) con el atributo "cantidad"
+model PersonajeObjeto {
+  personaje   Personaje @relation(fields: [personajeId], references: [id])
+  personajeId Int
+  objeto      Objeto    @relation(fields: [objetoId], references: [id])
+  objetoId    Int
+  cantidad    Int       @default(1)
+
+  @@id([personajeId, objetoId])
+}
+
+model PersonajeCampanaObjeto {
+  personajeCampana   PersonajeCampana @relation(fields: [personajeCampanaId], references: [id])
+  personajeCampanaId Int
+  objeto             Objeto           @relation(fields: [objetoId], references: [id])
+  objetoId           Int
+  cantidad           Int              @default(1)
+
+  @@id([personajeCampanaId, objetoId])
+}
+
+// ===================== RASGO / ACCIÓN =====================
+
 model Rasgo {
-  id                 Int               @id @default(autoincrement())
-  nombre             String
-  descripcion        String?
-  personajes         Personaje[]
-  personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
-  personajeCampanaId Int?
+  id              Int     @id @default(autoincrement())
+  nombre          String
+  descripcion     String?
+  visibleAJugador Boolean @default(true)
+  nivelMinimo     Int?
+  activo          Boolean @default(true)
+
+  campana   Campana? @relation(fields: [campanaId], references: [id])
+  campanaId Int?
+
+  personajes        Personaje[]
+  personajesCampana PersonajeCampana[]
 }
 
 model Accion {
-  id                 Int               @id @default(autoincrement())
-  nombre             String
-  descripcion        String?
-  personajes         Personaje[]
-  personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
-  personajeCampanaId Int?
+  id              Int     @id @default(autoincrement())
+  nombre          String
+  descripcion     String?
+  visibleAJugador Boolean @default(true)
+  costoMana       Int?
+  activo          Boolean @default(true)
+
+  campana   Campana? @relation(fields: [campanaId], references: [id])
+  campanaId Int?
+
+  personajes        Personaje[]
+  personajesCampana PersonajeCampana[]
 }
 
-model Estadistica {
-  id                 Int               @id @default(autoincrement())
-  nombre             String
-  valor              Int
-  modificador        String?
-  personajes         Personaje[]
-  personajeCampana   PersonajeCampana? @relation(fields: [personajeCampanaId], references: [id])
-  personajeCampanaId Int?
+// ===================== IMAGEN =====================
+
+model Imagen {
+  id          Int     @id @default(autoincrement())
+  nombre      String
+  descripcion String?
+  archivo     String
+
+  usuarios   Usuario[]
+  personajes Personaje[]
+  mapas      Mapa[]
+  objetos    Objeto[]
+  fichasMapa FichaMapa[]
 }

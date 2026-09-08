@@ -1,8 +1,25 @@
 import { personajeRepository } from "./personaje.repository";
-import { CreatePersonajeDTO, UpdatePersonajeDTO } from "./personaje.dto";
+import { CreatePersonajeDTO, UpdateJugableDTO, UpdateNoJugableDTO } from "./personaje.dto";
 import { prisma } from "../../lib/prisma";
-import { Prisma } from "@prisma/client";  
-import { ForbiddenError, NotFoundError } from "../../lib/errors";
+import { Prisma } from "@prisma/client";
+import { ForbiddenError, NotFoundError, BadRequestError } from "../../lib/errors";
+
+async function assertCanModify(
+  personaje: { tipo: string; usuarioId: number; campanaId: number | null },
+  usuarioId: number
+) {
+  if (personaje.tipo === "jugable") {
+    if (personaje.usuarioId !== usuarioId) {
+      throw new ForbiddenError("Solo el creador puede modificar este personaje");
+    }
+    return;
+  }
+
+  const campana = await prisma.campana.findUnique({ where: { id: personaje.campanaId! } });
+  if (!campana || campana.usuarioId !== usuarioId) {
+    throw new ForbiddenError("Solo el DM de la campaña puede modificar este NPC");
+  }
+}
 
 export const personajeService = {
   async create(data: CreatePersonajeDTO, usuarioId: number) {
@@ -13,14 +30,11 @@ export const personajeService = {
     return personajeRepository.create(data, usuarioId);
   },
 
-  async update(id: number, data: UpdatePersonajeDTO, usuarioId: number) {
+  async update(id: number, data: UpdateJugableDTO | UpdateNoJugableDTO, usuarioId: number) {
     const personaje = await personajeRepository.findById(id);
     if (!personaje) throw new NotFoundError("Personaje no encontrado");
 
-    // Autorización por fila: no alcanza con estar logueado
-    if (personaje.usuarioId !== usuarioId) {
-      throw new ForbiddenError("Solo el creador puede modificar este personaje");
-    }
+    await assertCanModify(personaje, usuarioId);
 
     return personajeRepository.update(id, data);
   },
@@ -38,14 +52,11 @@ async getOne(id: number) {
   async delete(id: number, usuarioId: number) {
     const personaje = await personajeRepository.findById(id);
     if (!personaje) throw new NotFoundError("Personaje no encontrado");
-    if (personaje.usuarioId !== usuarioId) {
-      throw new ForbiddenError("Solo el creador puede eliminar este personaje");
-    }
 
-    // Acá va la transacción si hay que limpiar huérfanos (objetos/rasgos específicos de campaña que queden sin PersonajeCampana asociado)
+    await assertCanModify(personaje, usuarioId);
+
     return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       await tx.personaje.delete({ where: { id } });
-      // ... chequeo de huérfanos si aplica
     });
   },
 

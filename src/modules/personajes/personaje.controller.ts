@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { personajeService } from "./personaje.service";
-import { createPersonajeSchema, updatePersonajeSchema } from "./personaje.dto";
+import {
+  createPersonajeSchema,
+  updateJugableSchema,      
+  updateNoJugableSchema,    
+} from "./personaje.dto";
 
 export const personajeController = {
   async create(req: Request, res: Response, next: NextFunction) {
@@ -13,15 +17,17 @@ export const personajeController = {
     }
   },
 
-  async update(req: Request, res: Response, next: NextFunction) {
-    try {
-      const data = updatePersonajeSchema.parse(req.body);
-      const personaje = await personajeService.update(Number(req.params.id), data, req.user.id);
-      res.json(personaje);
-    } catch (err) {
-      next(err);
-    }
-  },
+async update(req: Request, res: Response, next: NextFunction) {
+  try {
+    const personajeExistente = await personajeService.getOne(Number(req.params.id));
+    const schema = personajeExistente.tipo === "jugable" ? updateJugableSchema : updateNoJugableSchema;
+    const data = schema.parse(req.body);
+    const personaje = await personajeService.update(Number(req.params.id), data, req.user.id);
+    res.json(personaje);
+  } catch (err) {
+    next(err);
+  }
+},
   
     async misPersonajes(req: Request, res: Response, next: NextFunction) {
     try {

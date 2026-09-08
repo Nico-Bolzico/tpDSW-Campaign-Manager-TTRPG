@@ -3,8 +3,7 @@
     .) Al borrar un usuario que sea DM se le da baja lógica a todas las Campañas de las que sea dueño 
     .) Cuando se borra un Usuario se lo quita de todas las Campañas donde es jugador
     .) se borra el usuario --> entonces se borran todos los personajes que haya creado el usuario
-    .) al sumarse a una campaña no puede ingresar un personaje -->que ya haya sido creado por otro usuario
-                                                 |-->con mas de un personaje 
+
 2#CAMPAÑA
     .) Creada por un solo Usuario
     .) Estado = ["planificada" / "activa" / "pausada" / "finalizada"]
