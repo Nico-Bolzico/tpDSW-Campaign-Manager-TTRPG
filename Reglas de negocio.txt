@@ -3,8 +3,7 @@
     .) Al borrar un usuario que sea DM se le da baja lógica a todas las Campañas de las que sea dueño 
     .) Cuando se borra un Usuario se lo quita de todas las Campañas donde es jugador
     .) se borra el usuario --> entonces se borran todos los personajes que haya creado el usuario
-    .) al sumarse a una campaña no puede ingresar un personaje -->que ya haya sido creado por otro usuario
-                                                 |-->con mas de un personaje 
+
 2#CAMPAÑA
     .) Creada por un solo Usuario
     .) Estado = ["planificada" / "activa" / "pausada" / "finalizada"]
@@ -81,6 +80,10 @@
   .) modificador podemos definirlo como un valor calculado a partir de "valor"
   .) modificador puede ser negativo
   .) las modificaciones
+
+correcciones:
+    1) de usuario: SI SE PUEDE al sumarse a una campaña ingresar un personaje que ya haya sido creado por otro usuario Y con mas de un personaje 
+
 
 ----# Reglas Impostantes de integridad de la BD propuesta por Claude #---
 1)Consistencia campaña-personaje: en cualquier endpoint donde se reciban juntos campanaId y personajeId/personajeCampanaId/eventoId, validar que todos pertenezcan al mismo árbol de datos (evitar mezclar entidades de campañas distintas).
