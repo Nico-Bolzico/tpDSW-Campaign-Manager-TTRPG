@@ -1,5 +1,5 @@
-import { prisma } from "../../lib/prisma.js";
-import { CreatePersonajeDTO, UpdatePersonajeDTO } from "./personaje.dto";
+import { prisma } from "../../lib/prisma";
+import { CreatePersonajeDTO, UpdateJugableDTO, UpdateNoJugableDTO } from "./personaje.dto";
 
 export const personajeRepository = {
   create(data: CreatePersonajeDTO, usuarioId: number) {
@@ -11,7 +11,7 @@ export const personajeRepository = {
   findById(id: number) {
     return prisma.personaje.findUnique({
       where: { id },
-      include: { imagen: true, instancias: true },
+      include: { imagen: true, instancias: true, campana: true },
     });
   },
 
@@ -21,7 +21,7 @@ export const personajeRepository = {
     });
   },
 
-  update(id: number, data: UpdatePersonajeDTO) {
+  update(id: number, data: UpdateJugableDTO | UpdateNoJugableDTO) {
     return prisma.personaje.update({ where: { id }, data });
   },
 
