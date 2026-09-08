@@ -81,6 +81,10 @@
   .) modificador puede ser negativo
   .) las modificaciones
 
+correcciones:
+    1) de usuario: SI SE PUEDE al sumarse a una campaña ingresar un personaje que ya haya sido creado por otro usuario Y con mas de un personaje 
+
+
 ----# Reglas Impostantes de integridad de la BD propuesta por Claude #---
 1)Consistencia campaña-personaje: en cualquier endpoint donde se reciban juntos campanaId y personajeId/personajeCampanaId/eventoId, validar que todos pertenezcan al mismo árbol de datos (evitar mezclar entidades de campañas distintas).
 2)Transacciones: operaciones que tocan más de una tabla a la vez (ej: crear PersonajeCampana + sus Estadisticas iniciales, o borrar una Campana  deben hacerse dentro de una transacción de Prisma (prisma.$transaction) para evitar estados intermedios inconsistentes.
