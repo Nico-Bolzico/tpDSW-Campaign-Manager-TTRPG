@@ -8,6 +8,12 @@ const options: swaggerJsdoc.Options = {
       version: "1.0.0",
       description: "API para gestión de campañas, personajes y partidas de rol",
     },
+    servers: [
+      {
+        url: "/api",
+        description: "Servidor local",
+      },
+    ],
     components: {
       securitySchemes: {
         bearerAuth: {
